@@ -56,26 +56,24 @@ static NSString *const CHANNEL_NAME = @"PonnamKarthik/fluttertoast";
         style.messageColor = [self colorWithHex:textcolor.unsignedIntegerValue];
 
         if ([gravity isEqualToString:@"top"]) {
-            [[UIApplication sharedApplication].delegate.window.rootViewController.view makeToast:msg
-                                                                                        duration:time
-                                                                                        position:CSToastPositionTop
-                                                                                           style:style];
+            [[self getCurCt].view makeToast:msg duration:time position:CSToastPositionTop style:style];
         } else if ([gravity isEqualToString:@"center"]) {
-            [[UIApplication sharedApplication].delegate.window.rootViewController.view makeToast:msg
-                                                                                        duration:time
-                                                                                        position:CSToastPositionCenter
-                                                                                           style:style];
+            [[self getCurCt].view makeToast:msg duration:time position:CSToastPositionCenter style:style];
         } else {
-            [[UIApplication sharedApplication].delegate.window.rootViewController.view makeToast:msg
-                                                                                        duration:time
-                                                                                        position:CSToastPositionBottom
-                                                                                           style:style];
+            [[self getCurCt].view makeToast:msg duration:time position:CSToastPositionBottom style:style];
         }
 
         result(@"done");
     } else {
         result(FlutterMethodNotImplemented);
     }
+}
+- (UIViewController *) getCurCt {
+    UIViewController *ctr = [UIApplication sharedApplication].delegate.window.rootViewController;
+    while (ctr.presentedViewController) {
+        ctr = ctr.presentedViewController;
+    }
+    return ctr;
 }
 
 @end
