@@ -52,8 +52,10 @@ static NSString *const CHANNEL_NAME = @"PonnamKarthik/fluttertoast";
 
         CSToastStyle *style = [[CSToastStyle alloc] initWithDefaultStyle];
 
-        style.backgroundColor = [self colorWithHex:bgcolor.unsignedIntegerValue];
-        style.messageColor = [self colorWithHex:textcolor.unsignedIntegerValue];
+        if ((NSNull *)bgcolor != [NSNull null])
+            style.backgroundColor = [self colorWithHex:bgcolor.unsignedIntegerValue];
+        if ((NSNull *)textcolor != [NSNull null])
+            style.messageColor = [self colorWithHex:textcolor.unsignedIntegerValue];
 
         if ([gravity isEqualToString:@"top"]) {
             [[self getCurCt].view makeToast:msg duration:time position:CSToastPositionTop style:style];
