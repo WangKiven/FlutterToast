@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 void main() => runApp(new MyApp());
@@ -92,6 +93,14 @@ class _MyAppState extends State<MyApp> {
                     child: new Text('Show Colored Toast'),
                     onPressed: showColoredToast),
               ),
+              Builder(builder: (context){
+                return new Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: new RaisedButton(
+                      child: new Text('退出'),
+                      onPressed: ()=>SystemNavigator.pop()),
+                );
+              }),
             ],
           ),
         ),
