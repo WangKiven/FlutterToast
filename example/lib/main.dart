@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 void main() => runApp(new MyApp());
@@ -24,7 +23,7 @@ class _MyAppState extends State<MyApp> {
 
   void showColoredToast() {
     Fluttertoast.showToast(
-        msg: "This is Colored Toast",
+        msg: "This is Colored Toast with android duration of 5 Sec",
         toastLength: Toast.LENGTH_SHORT,
         backgroundColor: Colors.red,
         textColor: Colors.white);
@@ -51,6 +50,10 @@ class _MyAppState extends State<MyApp> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIos: 1);
+  }
+
+  void cancelToast() {
+    Fluttertoast.cancel();
   }
 
   @override
@@ -93,14 +96,13 @@ class _MyAppState extends State<MyApp> {
                     child: new Text('Show Colored Toast'),
                     onPressed: showColoredToast),
               ),
-              Builder(builder: (context){
-                return new Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: new RaisedButton(
-                      child: new Text('退出'),
-                      onPressed: ()=>SystemNavigator.pop()),
-                );
-              }),
+              new Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: new RaisedButton(
+                  child: new Text('Cancel Toasts'),
+                  onPressed: cancelToast,
+                ),
+              ),
             ],
           ),
         ),

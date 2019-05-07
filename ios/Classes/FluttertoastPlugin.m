@@ -1,13 +1,16 @@
 #import "FluttertoastPlugin.h"
 #import "UIView+Toast.h"
-// #import <fluttertoast/fluttertoast-Swift.h>
 
 static NSString *const CHANNEL_NAME = @"PonnamKarthik/fluttertoast";
 
+@interface FluttertoastPlugin ()
+@property(nonatomic, retain) FlutterMethodChannel *channel;
+@end
+
 @implementation FluttertoastPlugin {
     FlutterResult _result;
-}
 
+}
 
 + (void)registerWithRegistrar:(NSObject <FlutterPluginRegistrar> *)registrar {
     FlutterMethodChannel *channel = [FlutterMethodChannel
@@ -16,6 +19,7 @@ static NSString *const CHANNEL_NAME = @"PonnamKarthik/fluttertoast";
     UIViewController *viewController =
             [UIApplication sharedApplication].delegate.window.rootViewController;
     FluttertoastPlugin *instance = [[FluttertoastPlugin alloc] init];
+    instance.channel = channel;
     [registrar addMethodCallDelegate:instance channel:channel];
 
 }
@@ -32,13 +36,19 @@ static NSString *const CHANNEL_NAME = @"PonnamKarthik/fluttertoast";
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"showToast" isEqualToString:call.method]) {
+    if([@"cancel" isEqualToString:call.method]) {
+        [[UIApplication sharedApplication].delegate.window.rootViewController.view hideAllToasts];
+        result([NSNumber numberWithBool:true]);
+    } else if ([@"showToast" isEqualToString:call.method]) {
         NSString *msg = call.arguments[@"msg"];
         NSString *gravity = call.arguments[@"gravity"];
         NSString *durationTime = call.arguments[@"time"];
         NSNumber *bgcolor = call.arguments[@"bgcolor"];
         NSNumber *textcolor = call.arguments[@"textcolor"];
+        NSNumber *size = call.arguments[@"size"];
+        NSNumber *fontSize = call.arguments[@"fontSize"];
 
+        CGFloat cgf = [fontSize doubleValue];
         int time = 1;
         @try {
             time = [durationTime intValue];
@@ -51,31 +61,40 @@ static NSString *const CHANNEL_NAME = @"PonnamKarthik/fluttertoast";
 
 
         CSToastStyle *style = [[CSToastStyle alloc] initWithDefaultStyle];
+        style.messageFont = [UIFont systemFontOfSize:cgf];
+        style.backgroundColor = [self colorWithHex:bgcolor.unsignedIntegerValue];
+        style.messageColor = [self colorWithHex:textcolor.unsignedIntegerValue];
 
-        if ((NSNull *)bgcolor != [NSNull null])
-            style.backgroundColor = [self colorWithHex:bgcolor.unsignedIntegerValue];
-        if ((NSNull *)textcolor != [NSNull null])
-            style.messageColor = [self colorWithHex:textcolor.unsignedIntegerValue];
-
-        if ([gravity isEqualToString:@"top"]) {
-            [[self getCurCt].view makeToast:msg duration:time position:CSToastPositionTop style:style];
-        } else if ([gravity isEqualToString:@"center"]) {
-            [[self getCurCt].view makeToast:msg duration:time position:CSToastPositionCenter style:style];
-        } else {
-            [[self getCurCt].view makeToast:msg duration:time position:CSToastPositionBottom style:style];
+        if (@available(iOS 11.0, *)) {
+            UIWindow *window = UIApplication.sharedApplication.keyWindow;
+            CGFloat topPadding = window.safeAreaInsets.top;
+            CGFloat bottomPadding = window.safeAreaInsets.bottom;
         }
 
-        result(@"done");
+        if ([gravity isEqualToString:@"top"]) {
+            [[[UIApplication sharedApplication].windows lastObject] makeToast:msg
+                                                                                        duration:time
+                                                                                        position:CSToastPositionTop
+                                                                                           style:style
+                                                                                           ];
+        } else if ([gravity isEqualToString:@"center"]) {
+            [[[UIApplication sharedApplication].windows lastObject] makeToast:msg
+                                                                                        duration:time
+                                                                                        position:CSToastPositionCenter
+                                                                                           style:style
+                                                                                          ];
+        } else {
+            [[[UIApplication sharedApplication].windows lastObject] makeToast:msg
+                                                                                        duration:time
+                                                                                        position:CSToastPositionBottom
+                                                                                           style:style
+                                                                                           ];
+        }
+        result([NSNumber numberWithBool:true]);
+
     } else {
         result(FlutterMethodNotImplemented);
     }
-}
-- (UIViewController *) getCurCt {
-    UIViewController *ctr = [UIApplication sharedApplication].delegate.window.rootViewController;
-    while (ctr.presentedViewController) {
-        ctr = ctr.presentedViewController;
-    }
-    return ctr;
 }
 
 @end
